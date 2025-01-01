@@ -23,15 +23,17 @@ NOT_INGREDIENTS = ['Name', 'Garnish', 'Mix', 'Glass', 'Category', 'Notes']
 
 class Database(ABC):
 
-    def get_df(self) -> pd.DataFrame:
+    def get_data(self) -> pd.DataFrame:
         pass
 
     @staticmethod
-    def parse_csv(file: Union[IO | Path | str]):
+    def load_data(file: Union[IO | Path | str]) -> Tuple[pd.DataFrame, pd.Series]:
         data = pd.read_csv(file, index_col='Name')
-        data.columns = [column.strip() for column in data.columns]
         data.index = [ind.strip() for ind in data.index]
-        return data
+        data.columns = [column.strip() for column in data.columns]
+        ingredient_groups = data.loc['ingredient group']
+        data.drop(labels='ingredient group', axis=0, inplace=True)
+        return data, ingredient_groups
 
 
 class GoogleCSVDatabase(Database):
@@ -40,18 +42,24 @@ class GoogleCSVDatabase(Database):
         self._url = f"https://docs.google.com/spreadsheets/d/{key}/export?exportFormat=csv"
         super().__init__()
 
-    def get_df(self) -> pd.DataFrame: 
+    def get_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         with urllib.request.urlopen(self._url) as database_file:
-            return self.parse_csv(database_file)
+            return self.load_data(database_file)
 
 
 class LocalFileDatabase(Database):
 
-    def __init__(self):
-        resources_dir = resources.files('resources')
-        with resources.as_file(resources_dir / 'cocktails.csv') as csv_filepath:
-            self._csv_filepath = Path(csv_filepath)
+    def __init__(self, filepath: Union[str, Path]):
+        self._csv_filepath = Path(filepath)
         super().__init__()
 
-    def get_df(self) -> pd.DataFrame:
-        return self.parse_csv(self._csv_filepath)
+    def get_data(self) -> Tuple[pd.DataFrame, pd.Series]:
+        return self.load_data(self._csv_filepath)
+
+
+if __name__ == "__main__":
+
+    database = LocalFileDatabase("/Users/dicaprio/Downloads/Cocktailsv2 - Sheet1.csv")
+    print(database.get_data())
+    print(type(database.get_data()[0]))
+    print(type(database.get_data()[1]))
