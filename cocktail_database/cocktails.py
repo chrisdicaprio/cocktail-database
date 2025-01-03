@@ -19,7 +19,7 @@ class Ingredient:
     volume: str
     # category: str
 
-NOT_INGREDIENTS = ['Garnish', 'None', 'Bitters', 'Mix', 'Glass', 'Category', 'Notes']
+NOT_INGREDIENTS = ['Garnish', 'None', 'Mix', 'Glass', 'Category', 'Notes']
 
 @dataclass
 class IngredientGroup:

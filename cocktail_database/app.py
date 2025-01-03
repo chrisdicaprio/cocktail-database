@@ -31,6 +31,8 @@ ingredients = []
 ncols = 3
 cols = st.columns(ncols)
 for i, ingredient_group in enumerate(loader.ingredient_groups()):
+    if ingredient_group.name == 'Bitters':
+        continue
     with cols[i % ncols]:
         ingredients += st.multiselect(
             ingredient_group.name,
