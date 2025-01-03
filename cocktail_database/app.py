@@ -21,6 +21,10 @@ def write_cocktail(cocktail: 'Cocktail') -> None:
     if cocktail.notes:
         st.write(f"Notes: {cocktail.notes}")
 
+st.set_page_config(
+        page_title="The Cocktail Database",
+)
+
 key = st.secrets["GOOGLE_CSV_KEY"]
 database = GoogleCSVDatabase(key=key)
 # database = LocalFileDatabase("/Users/dicaprio/Downloads/Cocktailsv2 - Sheet1.csv")
